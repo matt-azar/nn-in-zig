@@ -1,5 +1,6 @@
 const std = @import("std");
 const mnist_loader = @import("mnist_loader.zig");
+const stdout = std.io.getStdOut().writer();
 
 /// Neural network with two hidden layers.
 /// Equipped with methods for initialization, stochastic gradient descent,
@@ -221,34 +222,60 @@ pub const Network = struct {
         return max_index;
     }
 
-    /// Save the network's parameters to a file.
+    /// Save the network's parameters to a file in your current working directory.
     pub fn save(self: *Network, file_name: []const u8) !void {
         const file = try std.fs.cwd().createFile(file_name, .{ .truncate = true });
         defer file.close();
+        const writer = file.writer();
+        var buffer: [64]u8 = undefined;
 
-        try file.writer().writeAll(self.weights1);
-        try file.writer().writeAll(self.weights2);
-        try file.writer().writeAll(self.weights3);
-        try file.writer().writeAll(self.biases1);
-        try file.writer().writeAll(self.biases2);
-        try file.writer().writeAll(self.biases3);
+        const Helper = struct {
+            fn writeArray(_writer: anytype, _buffer: []u8, array: []const f64) !void {
+                for (array) |value| {
+                    const str_value = try std.fmt.formatFloat(_buffer[0..], value, .{ .mode = .decimal });
+                    try _writer.writeAll(str_value);
+                    try _writer.writeAll("\n");
+                }
+            }
+        };
+
+        try Helper.writeArray(writer, &buffer, self.weights1[0..]);
+        try Helper.writeArray(writer, &buffer, self.weights2[0..]);
+        try Helper.writeArray(writer, &buffer, self.weights3[0..]);
+        try Helper.writeArray(writer, &buffer, self.biases1[0..]);
+        try Helper.writeArray(writer, &buffer, self.biases2[0..]);
+        try Helper.writeArray(writer, &buffer, self.biases3[0..]);
+
+        try stdout.print("Successfully saved network to {s}\n", .{file_name});
     }
 
-    // TODO
-    // pub fn load(self: *Network, file_name: []const u8) !void {
-    //     const file = try std.fs.cwd().openFile(file_name, .{});
-    //     defer file.close();
+    /// Load the network's parameters from a file in your current working directory.
+    pub fn load(self: *Network, file_name: []const u8) !void {
+        const file = try std.fs.cwd().openFile(file_name, .{});
+        defer file.close();
+        const reader = file.reader();
+        var buffer: [64]u8 = undefined;
 
-    //     var reader = file.reader();
+        const Helper = struct {
+            fn readArray(_reader: anytype, _buffer: []u8, array: []f64) !void {
+                for (array) |*value| {
+                    const line = try _reader.readUntilDelimiterOrEof(_buffer[0..], '\n') orelse {
+                        return error.UnexpectedEndOfFile;
+                    };
+                    value.* = try std.fmt.parseFloat(f64, line);
+                }
+            }
+        };
 
-    //     // Read weights and biases as raw bytes
-    //     try reader.readBytesNoEof(@as([*]u8, self.weights1.ptr)[0 .. self.weights1.len * @sizeOf(f64)]);
-    //     try reader.readBytesNoEof(@as([*]u8, self.weights2.ptr)[0 .. self.weights2.len * @sizeOf(f64)]);
-    //     try reader.readBytesNoEof(@as([*]u8, self.weights3.ptr)[0 .. self.weights3.len * @sizeOf(f64)]);
-    //     try reader.readBytesNoEof(@as([*]u8, self.biases1.ptr)[0 .. self.biases1.len * @sizeOf(f64)]);
-    //     try reader.readBytesNoEof(@as([*]u8, self.biases2.ptr)[0 .. self.biases2.len * @sizeOf(f64)]);
-    //     try reader.readBytesNoEof(@as([*]u8, self.biases3.ptr)[0 .. self.biases3.len * @sizeOf(f64)]);
-    // }
+        try Helper.readArray(reader, &buffer, self.weights1[0..]);
+        try Helper.readArray(reader, &buffer, self.weights2[0..]);
+        try Helper.readArray(reader, &buffer, self.weights3[0..]);
+        try Helper.readArray(reader, &buffer, self.biases1[0..]);
+        try Helper.readArray(reader, &buffer, self.biases2[0..]);
+        try Helper.readArray(reader, &buffer, self.biases3[0..]);
+
+        try stdout.print("Successfully loaded network from {s}\n", .{file_name});
+    }
 };
 
 /// ReLU activation function.

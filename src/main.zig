@@ -3,8 +3,6 @@ const Network = @import("nn.zig").Network;
 const mnist_loader = @import("mnist_loader.zig");
 
 pub fn main() anyerror!void {
-    const start = std.time.milliTimestamp();
-
     const stdout = std.io.getStdOut().writer();
     const allocator = std.heap.page_allocator;
 
@@ -33,28 +31,23 @@ pub fn main() anyerror!void {
     if (train_num_images != train_num_labels or
         test_num_images != test_num_labels)
     {
-        // std.debug.print("Mismatch between images and labels.\n", .{});
         try stdout.print("Mismatch between images and labels.\n", .{});
         return;
     }
 
     var net = Network.init();
 
-    const load: bool = false;
+    var load = false;
+    std.debug.print("Load network from mnist_model.bin? [y/N]\n", .{});
+    const l = std.io.getStdIn().reader().readByte();
+    if (try l == 'y') {
+        load = true;
+        try net.load("mnist_model.bin");
+    }
 
-    // TODO
-    // Load weights (optional)
-    // const load = false;
-    // std.debug.print("Load network from nn_weights.bin? [y/N]\n", .{});
-
-    // const l = std.io.getStdIn().reader().readByte();
-    // if (try l == 'y') {
-    //     load = true;
-    //     try net.load("nn_weights.bin");
-    // }
+    const start = std.time.milliTimestamp();
 
     if (!load) {
-        // Initialize weights and biases
         net.initializeWeights();
         net.initializeBiases();
 
@@ -86,7 +79,7 @@ pub fn main() anyerror!void {
             learning_rate *= 0.9;
         }
 
-        // try net.save("nn_weights.bin");
+        try net.save("mnist_model.bin");
     }
 
     // testing loop
