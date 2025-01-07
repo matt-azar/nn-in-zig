@@ -7,16 +7,17 @@ pub fn readInt(file: []const u8) !u32 {
 }
 
 pub fn loadImages(allocator: std.mem.Allocator, file_name: []const u8, num_images: *usize) ![][]u8 {
-    // TODO: figure out how to open files with relative file path
+    // Be careful with relative paths. If you want to be able to open files during tests,
+    // you need to have the /raw folder in your /src directory. When you build the project
+    // with zig build, it will look for the /raw folder in the project's main directory.
+    // The workaround to this is to have /raw in /nn-in-zig and in /nn-in-zig/src.
 
-    // const dir = std.fs.cwd();
-    // const file = try std.fs.Dir.openFile(dir, file_name, .{});
-    const file = try std.fs.openFileAbsolute(file_name, .{});
+    // const file = try std.fs.openFileAbsolute(file_name, .{}); // uses absolute path
+    const file = try std.fs.cwd().openFile(file_name, .{}); // uses relative path
     defer file.close();
+
     const file_size: usize = try file.getEndPos();
-
     const buffer = try file.reader().readAllAlloc(allocator, file_size);
-
     const magic_number = try readInt(buffer[0..4]);
     if (magic_number != 0x00000803) {
         return error.InvalidMagicNumber;
@@ -41,14 +42,12 @@ pub fn loadImages(allocator: std.mem.Allocator, file_name: []const u8, num_image
 }
 
 pub fn loadLabels(allocator: std.mem.Allocator, file_name: []const u8, num_labels: *usize) ![]u8 {
-    // const dir = std.fs.cwd();
-    // const file = try std.fs.Dir.openFile(dir, file_name, .{});
-    const file = try std.fs.openFileAbsolute(file_name, .{});
+    // const file = try std.fs.openFileAbsolute(file_name, .{});
+    const file = try std.fs.cwd().openFile(file_name, .{});
     defer file.close();
+
     const file_size: usize = try file.getEndPos();
-
     const buffer = try file.reader().readAllAlloc(allocator, file_size);
-
     const magic_number = try readInt(buffer[0..4]);
     if (magic_number != 0x00000801) {
         return error.InvalidMagicNumber;
@@ -57,6 +56,10 @@ pub fn loadLabels(allocator: std.mem.Allocator, file_name: []const u8, num_label
 
     return buffer[8..];
 }
+
+// TODO: pub fn loadSingleImage()
+// Load a single image with a label, to test hand drawn images outside the
+// MNIST dataset.
 
 pub fn displayImage(image: []const u8) void {
     for (0..28) |i| {
@@ -68,15 +71,20 @@ pub fn displayImage(image: []const u8) void {
     }
 }
 
+//
+//
+//
+//                           *** unit tests ***
+//
+//
+//
+
+// use `zig test mnist_loader.zig` in CLI if you want the program to find a relative path
 test "display image" {
     const allocator = std.heap.page_allocator;
 
-    // if using openFileAbsolute()
-    const image_file = "/home/maa/dev/source/ml/mnist/nn-in-zig/raw/train-images-idx3-ubyte";
-    const label_file = "/home/maa/dev/source/ml/mnist/nn-in-zig/raw/train-labels-idx1-ubyte";
-
-    // const image_file = "/raw/train-images-idx3-ubyte";
-    // const label_file = "/raw/train-labels-idx1-ubyte";
+    const image_file = "raw/train-images-idx3-ubyte";
+    const label_file = "raw/train-labels-idx1-ubyte";
 
     var num_images: usize = 0;
     var num_labels: usize = 0;

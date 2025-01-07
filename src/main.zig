@@ -10,11 +10,10 @@ pub fn main() anyerror!void {
     var learning_rate: f64 = 1.6e-3;
     const dropout_rate: f64 = 0.0;
 
-    // TODO: figure out how to use relative file paths
-    const train_image_file = "/home/maa/dev/source/ml/mnist/nn-in-zig/raw/train-images-idx3-ubyte";
-    const train_label_file = "/home/maa/dev/source/ml/mnist/nn-in-zig/raw/train-labels-idx1-ubyte";
-    const test_image_file = "/home/maa/dev/source/ml/mnist/nn-in-zig/raw/t10k-images-idx3-ubyte";
-    const test_label_file = "/home/maa/dev/source/ml/mnist/nn-in-zig/raw/t10k-labels-idx1-ubyte";
+    const train_image_file = "raw/train-images-idx3-ubyte";
+    const train_label_file = "raw/train-labels-idx1-ubyte";
+    const test_image_file = "raw/t10k-images-idx3-ubyte";
+    const test_label_file = "raw/t10k-labels-idx1-ubyte";
 
     // Load MNIST data
     var train_num_images: usize = 0;
