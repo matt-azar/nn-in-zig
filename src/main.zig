@@ -26,11 +26,8 @@ pub fn main() anyerror!void {
     var test_num_labels: usize = 0;
 
     const train_images = try mnist_loader.loadImages(allocator, train_image_file, &train_num_images);
-
     const train_labels = try mnist_loader.loadLabels(allocator, train_label_file, &train_num_labels);
-
     const test_images = try mnist_loader.loadImages(allocator, test_image_file, &test_num_images);
-
     const test_labels = try mnist_loader.loadLabels(allocator, test_label_file, &test_num_labels);
 
     if (train_num_images != train_num_labels or
@@ -75,7 +72,7 @@ pub fn main() anyerror!void {
                     const image = train_images[i][j];
                     input[j] = @as(f64, @floatFromInt(image)) / 255.0;
                 }
-                net.SGD(&input, dropout_rate, true);
+                net.forward(&input, dropout_rate, true);
                 net.backpropagate(&input, train_labels[i], learning_rate);
                 epoch_loss += net.cost(train_labels[i]);
                 if ((i + 1) % 1000 == 0 or i == train_num_images - 1) {
@@ -102,7 +99,7 @@ pub fn main() anyerror!void {
             input[j] = @as(f64, @floatFromInt(image)) / 255.0;
         }
 
-        net.SGD(&input, dropout_rate, false);
+        net.forward(&input, dropout_rate, false);
         if (net.predict() == @as(usize, test_labels[i])) {
             correct += 1;
         }

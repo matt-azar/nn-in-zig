@@ -101,8 +101,8 @@ pub const Network = struct {
         return -std.math.log(f64, std.math.e, self.output[target_label] + epsilon);
     }
 
-    /// Train the neural network using stochastic gradient descent.
-    pub fn SGD(self: *Network, input: []f64, dropout_rate: f64, is_training: bool) void {
+    /// Train the neural network using gradient descent.
+    pub fn forward(self: *Network, input: []f64, dropout_rate: f64, is_training: bool) void {
         var rng = std.rand.DefaultPrng.init(@abs(std.time.timestamp()));
 
         // First hidden layer
@@ -311,7 +311,7 @@ test "Epoch" {
             const image = images[i][j];
             input[j] = @as(f64, @floatFromInt(image)) / 255.0;
         }
-        net.SGD(&input, 0.0, true);
+        net.forward(&input, 0.0, true);
         net.backpropagate(&input, labels[i], 1e-3);
         loss += net.cost(labels[i]);
     }
