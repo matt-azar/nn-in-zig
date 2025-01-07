@@ -33,7 +33,7 @@ pub fn build(b: *std.Build) void {
         .name = "nn-in-zig",
         .root_source_file = b.path("src/main.zig"),
         .target = target,
-        .optimize = .ReleaseFast,
+        .optimize = .ReleaseSafe,
     });
 
     // This declares intent for the executable to be installed into the

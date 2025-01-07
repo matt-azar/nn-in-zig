@@ -291,35 +291,40 @@ pub fn reluDerivative(x: f64) f64 {
     return if (x > 0.0) 1.0 else 0.0;
 }
 
-// *** unit tests ***
+//
+//
+//                           *** unit tests ***
+//
+//
+//
+
 test "Weights and biases initialized" {
     var net = Network.init();
     net.initializeWeights();
     net.initializeBiases();
 
     var rng = std.rand.DefaultPrng.init(@abs(std.time.timestamp()));
-
     var idx: usize = rng.random().intRangeAtMost(usize, 0, net.weights1.len);
-
     if (idx >= net.weights1.len) {
         idx = @mod(idx, net.weights1.len);
     }
-
     std.debug.print("\n\nWeight at index {}: {}\n\n", .{ idx, net.weights1[idx] });
-
     if (idx >= net.biases1.len) {
         idx = @mod(idx, net.biases1.len);
     }
-
     std.debug.print("Bias at index {}: {}\n\n", .{ idx, net.biases1[idx] });
 }
 
 test "Epoch" {
     const start = std.time.milliTimestamp();
 
-    const allocator = std.heap.page_allocator;
+    // TODO: investigate differences between page_allocator and GeneralPurposeAllocator.
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    const allocator = gpa.allocator();
+
     const image_file = "/home/maa/dev/source/ml/mnist/nn-in-zig/raw/train-images-idx3-ubyte";
     const label_file = "/home/maa/dev/source/ml/mnist/nn-in-zig/raw/train-labels-idx1-ubyte";
+
     var num_images: usize = 0;
     var num_labels: usize = 0;
 
@@ -342,10 +347,8 @@ test "Epoch" {
         net.backpropagate(&input, labels[i], 1e-3);
         loss += net.cost(labels[i]);
     }
-
     loss /= @as(f64, @floatFromInt(num_images));
 
-    std.debug.print("\n\nLoss: {}\n\n", .{loss});
-
+    std.debug.print("\n\nLoss: {d}\n\n", .{loss});
     std.debug.print("Runtime: {} ms\n\n", .{std.time.milliTimestamp() - start});
 }

@@ -13,8 +13,8 @@ pub fn loadImages(allocator: std.mem.Allocator, file_name: []const u8, num_image
     // const file = try std.fs.Dir.openFile(dir, file_name, .{});
     const file = try std.fs.openFileAbsolute(file_name, .{});
     defer file.close();
-
     const file_size: usize = try file.getEndPos();
+
     const buffer = try file.reader().readAllAlloc(allocator, file_size);
 
     const magic_number = try readInt(buffer[0..4]);
@@ -46,14 +46,15 @@ pub fn loadLabels(allocator: std.mem.Allocator, file_name: []const u8, num_label
     const file = try std.fs.openFileAbsolute(file_name, .{});
     defer file.close();
     const file_size: usize = try file.getEndPos();
+
     const buffer = try file.reader().readAllAlloc(allocator, file_size);
 
     const magic_number = try readInt(buffer[0..4]);
     if (magic_number != 0x00000801) {
         return error.InvalidMagicNumber;
     }
-
     num_labels.* = try readInt(buffer[4..8]);
+
     return buffer[8..];
 }
 
@@ -77,16 +78,11 @@ test "display image" {
     // const image_file = "/raw/train-images-idx3-ubyte";
     // const label_file = "/raw/train-labels-idx1-ubyte";
 
-    const dir = std.fs.cwd();
-    std.debug.print("\n\nCWD: {any}\n\n", .{dir});
-
     var num_images: usize = 0;
     var num_labels: usize = 0;
 
     const images = try loadImages(allocator, image_file, &num_images);
-    // defer allocator.free(images);
     const labels = try loadLabels(allocator, label_file, &num_labels);
-    // defer allocator.free(labels);
 
     try std.testing.expectEqual(num_images, num_labels);
 

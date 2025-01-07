@@ -38,7 +38,7 @@ pub fn main() anyerror!void {
     var net = Network.init();
 
     var load = false;
-    std.debug.print("Load network from mnist_model.bin? [y/N]\n", .{});
+    try stdout.print("Load network from mnist_model.bin? [y/N]\n", .{});
     const l = std.io.getStdIn().reader().readByte();
     if (try l == 'y') {
         load = true;
