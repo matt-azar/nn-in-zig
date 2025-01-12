@@ -65,19 +65,23 @@ pub fn displayImage(image: []const u8) void {
     for (0..28) |i| {
         for (0..28) |j| {
             const pixel = image[i * 28 + j];
-            std.debug.print("{s}", .{if (pixel > 128) "#" else "."});
+            if (pixel > 64 and pixel < 128) {
+                std.debug.print("{s}", .{"."});
+            } else if (pixel >= 128 and pixel < 192) {
+                std.debug.print("{s}", .{"*"});
+            } else {
+                std.debug.print("{s}", .{if (pixel > 128) "#" else " "});
+            }
         }
         std.debug.print("\n", .{});
     }
 }
 
-//
-//
-//
-//                           *** unit tests ***
-//
-//
-//
+//      ==================
+//      *                *
+//      *   unit tests   *
+//      *                *
+//      ==================
 
 // use `zig test mnist_loader.zig` in CLI if you want the program to find a relative path
 test "display image" {

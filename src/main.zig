@@ -1,6 +1,7 @@
 const std = @import("std");
 const Network = @import("nn.zig").Network;
 const mnist_loader = @import("mnist_loader.zig");
+const assert = std.debug.assert;
 
 pub fn main() anyerror!void {
     const stdout = std.io.getStdOut().writer();
