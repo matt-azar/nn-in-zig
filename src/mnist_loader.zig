@@ -77,11 +77,11 @@ pub fn displayImage(image: []const u8) void {
     }
 }
 
-//      ==================
-//      *                *
-//      *   unit tests   *
-//      *                *
-//      ==================
+//  .     .   .      o       .          .       *  . .     .
+//    .  *  |     .    .==============  .     .   .     * .    .
+//        --o--         | unit tests |     *    |      ..    .
+//     *    |       *  .==============   .    --*--  .     *  .
+//  .     .    .    .   . . .      .        .   |   .    .  .
 
 // use `zig test mnist_loader.zig` in CLI if you want the program to find a relative path
 test "display image" {

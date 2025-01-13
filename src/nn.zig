@@ -291,11 +291,11 @@ pub fn reluDerivative(x: f64) f64 {
     return if (x > 0.0) 1.0 else 0.0;
 }
 
-//      ==================
-//      *                *
-//      *   unit tests   *
-//      *                *
-//      ==================
+//  .     .   .      o       .          .       *  . .     .
+//    .  *  |     .    .==============  .     .   .     * .    .
+//        --o--         | unit tests |     *    |      ..    .
+//     *    |       *  .==============   .    --*--  .     *  .
+//  .     .    .    .   . . .      .        .   |   .    .  .
 
 test "Weights and biases initialized" {
     var net = Network.init();
