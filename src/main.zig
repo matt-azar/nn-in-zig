@@ -52,10 +52,9 @@ pub fn main() anyerror!void {
         net.initializeBiases();
 
         try stdout.print("Training samples: {}\nTesting samples: {}\n\n", .{ train_num_images, test_num_images });
-
-        // training loop
         try stdout.print("Running {} epochs...\n", .{epochs});
 
+        // training loop
         for (0..epochs) |epoch| {
             var epoch_loss: f64 = 0.0;
 

@@ -45,7 +45,7 @@ pub const Network = struct {
         const limit2 = std.math.sqrt(6.0 / @as(f64, Network.hidden_size1));
         const limit3 = std.math.sqrt(6.0 / @as(f64, Network.hidden_size2));
 
-        var rng = std.rand.DefaultPrng.init(@abs(std.time.timestamp()));
+        var rng = std.Random.DefaultPrng.init(@abs(std.time.timestamp()));
 
         for (self.weights1[0..]) |*w| {
             w.* = rng.random().float(f64) * (2.0 * limit1) - limit1;
@@ -62,7 +62,7 @@ pub const Network = struct {
 
     /// Initialize biases to a random value in [0, 0.01].
     pub fn initializeBiases(self: *Network) void {
-        var rng = std.rand.DefaultPrng.init(@abs(std.time.timestamp()));
+        var rng = std.Random.DefaultPrng.init(@abs(std.time.timestamp()));
 
         for (self.biases1[0..]) |*b| {
             b.* = rng.random().float(f64) / 100;
@@ -104,7 +104,7 @@ pub const Network = struct {
 
     /// Train the neural network using gradient descent.
     pub fn forward(self: *Network, input: []f64, dropout_rate: f64, is_training: bool) void {
-        var rng = std.rand.DefaultPrng.init(@abs(std.time.timestamp()));
+        var rng = std.Random.DefaultPrng.init(@abs(std.time.timestamp()));
 
         // First hidden layer
         for (0..Network.hidden_size1) |i| {
