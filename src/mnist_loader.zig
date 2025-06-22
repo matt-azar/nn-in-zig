@@ -57,12 +57,10 @@ pub fn loadLabels(allocator: std.mem.Allocator, file_name: []const u8, num_label
     return buffer[8..];
 }
 
-// TODO: pub fn loadSingleImage()
-// Load a single image with a label, to test hand drawn images outside the
-// MNIST dataset.
-
-// TODO: pub fn getUserImage()
-// Generate a GUI to draw a number and save it as a 28x28 image to test.
+/// Prompt the user to draw a digit in a GUI window.
+pub fn getUserImage(allocator: std.mem.Allocator) ![]u8 {
+    return try @import("draw_gui.zig").drawAndGetImage(allocator);
+}
 
 pub fn displayImage(image: []const u8) void {
     for (0..28) |i| {
@@ -83,7 +81,7 @@ pub fn displayImage(image: []const u8) void {
 //  .     .   .      o       .          .       *  . .     .
 //    .  *  |     .    .==============  .     .   .     * .    .
 //        --o--         | unit tests |     *    |      ..    .
-//     *    |       *  .==============   .    --*--  .     *  .
+//     *    |       *  .==============   .    --*--  .     * .
 //  .     .    .    .   . . .      .        .   |   .    .  .
 
 // use `zig test mnist_loader.zig` in CLI if you want the program to find a relative path
@@ -112,3 +110,13 @@ test "display image" {
         std.debug.print("No images loaded.\n", .{});
     }
 }
+
+// test "get user image" {
+//     const allocator = std.heap.page_allocator;
+
+//     const image = try getUserImage(allocator);
+//     defer allocator.free(image);
+
+//     std.debug.print("User drawn image:\n", .{});
+//     displayImage(image);
+// }

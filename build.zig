@@ -36,6 +36,12 @@ pub fn build(b: *std.Build) void {
         .optimize = .ReleaseSafe,
     });
 
+    exe.addCSourceFile(.{ .file = b.path("src/draw_gui.c"), .flags = &.{} });
+
+    // Link SDL2 for GUI drawing
+    exe.linkSystemLibrary("SDL2");
+    exe.linkLibC(); // Link the C standard library for calloc/free
+
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default
     // step when running `zig build`).

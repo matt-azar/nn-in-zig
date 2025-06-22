@@ -40,9 +40,12 @@ pub fn main() anyerror!void {
     var load = false;
     try stdout.print("Load network from mnist_model.bin? [y/N]\n", .{});
     const l = std.io.getStdIn().reader().readByte();
+
     if (try l == 'y') {
         load = true;
         try net.load("mnist_model.bin");
+        // Consume the newline character left in the input buffer
+        _ = try std.io.getStdIn().reader().readByte();
     }
 
     const start = std.time.milliTimestamp();
@@ -102,5 +105,21 @@ pub fn main() anyerror!void {
 
     const stop = std.time.milliTimestamp();
     const elapsed_ms: f64 = @as(f64, @floatFromInt(stop - start));
-    try stdout.print("Runtime: {d} seconds.\n", .{elapsed_ms / 1000});
+    if (!load)
+        try stdout.print("Runtime: {d} seconds.\n", .{elapsed_ms / 1000});
+
+    // User drawing and classification
+    try stdout.print("Draw a digit? [Y/n]\n", .{});
+    const n = std.io.getStdIn().reader().readByte();
+
+    if (try n != 'n' and try n != 'N') {
+        const user_image = try mnist_loader.getUserImage(allocator);
+        var input = [_]f64{0} ** Network.image_size;
+        for (0..Network.image_size) |j| {
+            input[j] = @as(f64, @floatFromInt(user_image[j])) / 255.0;
+        }
+        net.forward(&input, 0.0, false);
+        const prediction = net.predict();
+        try stdout.print("Predicted digit: {}\n", .{prediction});
+    }
 }
