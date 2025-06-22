@@ -61,6 +61,9 @@ pub fn loadLabels(allocator: std.mem.Allocator, file_name: []const u8, num_label
 // Load a single image with a label, to test hand drawn images outside the
 // MNIST dataset.
 
+// TODO: pub fn getUserImage()
+// Generate a GUI to draw a number and save it as a 28x28 image to test.
+
 pub fn displayImage(image: []const u8) void {
     for (0..28) |i| {
         for (0..28) |j| {
