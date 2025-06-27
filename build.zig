@@ -8,6 +8,11 @@ pub fn build(b: *std.Build) void {
     // what target to build for. Here we do not override the defaults, which
     // means any target is allowed, and the default is native. Other options
     // for restricting supported target set are available.
+
+    // TODO: Build a windows executable
+    // const target = b.standardTargetOptions(.{ .os_tag = .windows });
+    // const target = b.standardTargetOptions(.{ .os_tag = .linux });
+    // const target = b.standardTargetOptions(.{ .os_tag = .macos });
     const target = b.standardTargetOptions(.{});
 
     // Standard optimization options allow the person running `zig build` to select
@@ -37,9 +42,10 @@ pub fn build(b: *std.Build) void {
     });
 
     exe.addCSourceFile(.{ .file = b.path("src/draw_gui.c"), .flags = &.{} });
-
+    exe.addCSourceFile(.{ .file = b.path("src/gui_options.c"), .flags = &.{} });
     // Link SDL2 for GUI drawing
     exe.linkSystemLibrary("SDL2");
+    exe.linkSystemLibrary("SDL2_ttf");
     exe.linkLibC(); // Link the C standard library for calloc/free
 
     // This declares intent for the executable to be installed into the
