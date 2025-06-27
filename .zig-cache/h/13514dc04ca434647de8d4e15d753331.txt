@@ -1,5 +1,5 @@
 0
-6268 657518 1751048600435202694 dc558c61b7feab6fda0b5c27534c483b 0 /home/mja/dev/source/ml/mnist/nn-in-zig/src/gui_options.c
+6326 657518 1751057866831048887 6dfe72a416166b695e3781d484bd4f6c 0 /home/mja/dev/source/ml/mnist/nn-in-zig/src/gui_options.c
 491 657508 1751048298259258415 02baab45e0a4e892fd877193724a6b1d 0 /home/mja/dev/source/ml/mnist/nn-in-zig/src/gui_options.h
 8062 638844 1653939257000000000 f089d20f8b97c4e6f25190dee4b476b6 0 /usr/include/SDL2/SDL.h
 7588 638869 1653939257000000000 3c2f70ed029a786de1020657babf6106 0 /usr/include/SDL2/SDL_main.h
