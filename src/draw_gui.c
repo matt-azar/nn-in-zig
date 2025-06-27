@@ -6,6 +6,12 @@
 #define IMG_SIZE 28
 #define SCALE (WIN_SIZE / IMG_SIZE)
 
+/**
+ * @brief Draws a digit on the screen and retrieves the image data.
+ *
+ * @param out_image Pointer to a buffer to store the drawn image.
+ * @return int 0 on success, non-zero on error.
+ */
 int draw_and_get_image(unsigned char *out_image) {
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
         return 1;
@@ -94,5 +100,6 @@ int draw_and_get_image(unsigned char *out_image) {
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
+
     return 0;
 }

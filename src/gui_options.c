@@ -7,7 +7,15 @@
 
 extern int draw_and_get_image(unsigned char *out_image);
 
-// Helper to render text
+/**
+ * @brief Render text on the screen.
+ *
+ * @param renderer SDL_Renderer to draw the text on.
+ * @param font TTF_Font to use for the text.
+ * @param text The text string to render.
+ * @param x The x position to render the text.
+ * @param y The y position to render the text.
+ */
 static void render_text(SDL_Renderer *renderer, TTF_Font *font,
                         const char *text, int x, int y) {
     SDL_Color color = {255, 255, 255, 255};
@@ -19,6 +27,12 @@ static void render_text(SDL_Renderer *renderer, TTF_Font *font,
     SDL_DestroyTexture(texture);
 }
 
+/**
+ * @brief Get user options from the GUI.
+ *
+ * @param out_opts Pointer to a GuiOptions struct to fill with user selections.
+ * @return int 0 on success, non-zero on error.
+ */
 int gui_get_user_options(GuiOptions *out_opts) {
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
         return 1;
@@ -55,8 +69,8 @@ int gui_get_user_options(GuiOptions *out_opts) {
     int load_model = 0;
     int draw_digit = 1;
     int confirmed = 0;
-    int epochs = 5;
-    float learning_rate = 0.0016f;
+    int epochs = 5;                // Default epochs
+    float learning_rate = 0.0016f; // Default learning rate
     char epoch_str[8] = "5";
     char lr_str[16] = "0.0016";
     int input_field = 0; // 0=none, 1=epochs, 2=lr
