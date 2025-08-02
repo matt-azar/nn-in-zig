@@ -3,6 +3,7 @@ const Network = @import("nn.zig").Network;
 const mnist_loader = @import("mnist_loader.zig");
 const gui = @import("gui_options.zig");
 const assert = std.debug.assert;
+const stdout = std.io.getStdOut().writer();
 
 pub fn main() anyerror!void {
     const allocator = std.heap.page_allocator;
@@ -11,13 +12,17 @@ pub fn main() anyerror!void {
     while (true) {
         const opts: gui.GuiOptions = try gui.getUserOptions();
         if (opts.confirmed == 0) {
-            std.debug.print("GUI canceled or closed, exiting.\n", .{});
+            try stdout.print("GUI canceled or closed, exiting.\n", .{});
             break;
         }
-        std.debug.print("GUI Options Selected - load_model: {}, epochs: {}, learning_rate: {d}, draw_digit: {}\n", .{ opts.load_model, opts.epochs, opts.learning_rate, opts.draw_digit });
+        try stdout.print("GUI Options Selected - load_model: {}, epochs: {}, learning_rate: {d}, draw_digit: {}\n", .{ opts.load_model, opts.epochs, opts.learning_rate, opts.draw_digit });
 
         const epochs: usize = if (opts.epochs > 0) @as(usize, @intCast(opts.epochs)) else 10;
         var learning_rate: f64 = if (opts.learning_rate > 0.0) @as(f64, opts.learning_rate) else 1.6e-3;
+
+        // https://en.wikipedia.org/wiki/Dilution_(neural_networks)
+        // So far, applying dropout has only decreased accuracy.
+        // Presumably this is because the model/task is too simple for dropout to be beneficial.
         const dropout_rate: f64 = 0.0;
 
         const train_image_file = "raw/train-images-idx3-ubyte";
@@ -36,7 +41,7 @@ pub fn main() anyerror!void {
         const test_labels = try mnist_loader.loadLabels(allocator, test_label_file, &test_num_labels);
 
         if (train_num_images != train_num_labels or test_num_images != test_num_labels) {
-            std.debug.print("Mismatch between images and labels.\n", .{});
+            try stdout.print("Mismatch between images and labels.\n", .{});
             return;
         }
 
@@ -46,8 +51,8 @@ pub fn main() anyerror!void {
         } else {
             net.initializeWeights();
             net.initializeBiases();
-            std.debug.print("Training samples: {}\nTesting samples: {}\n\n", .{ train_num_images, test_num_images });
-            std.debug.print("Running {} epochs...\n", .{epochs});
+            try stdout.print("Training samples: {}\nTesting samples: {}\n\n", .{ train_num_images, test_num_images });
+            try stdout.print("Running {} epochs...\n", .{epochs});
             for (0..epochs) |epoch| {
                 var epoch_loss: f64 = 0.0;
                 for (0..train_num_images) |i| {
@@ -60,18 +65,19 @@ pub fn main() anyerror!void {
                     net.backpropagate(&input, train_labels[i], learning_rate);
                     epoch_loss += net.cost(train_labels[i]);
                     if ((i + 1) % 1000 == 0 or i == train_num_images - 1) {
-                        std.debug.print("Epoch {}: Sample {}/{}\r", .{ epoch + 1, i + 1, train_num_images });
+                        try stdout.print("Epoch {}: Sample {}/{}\r", .{ epoch + 1, i + 1, train_num_images });
                     }
                 }
                 epoch_loss /= @as(f64, @floatFromInt(train_num_images));
-                std.debug.print("\n\t Loss: {d:.4}\n", .{epoch_loss});
-                std.debug.print("\t Learning rate: {d:.6}\n", .{learning_rate});
+                try stdout.print("\n\t Loss: {d:.4}\n", .{epoch_loss});
+                try stdout.print("\t Learning rate: {d:.6}\n", .{learning_rate});
+
                 learning_rate *= 0.9;
             }
             try net.save("mnist_model.bin");
         }
 
-        // testing loop
+        // Testing loop
         var correct: usize = 0;
         for (0..test_num_images) |i| {
             var input = [_]f64{0} ** Network.image_size;
@@ -85,7 +91,7 @@ pub fn main() anyerror!void {
             }
         }
         const accuracy = 100.0 * @as(f64, @floatFromInt(correct)) / @as(f64, @floatFromInt(test_num_images));
-        std.debug.print("\nTest Accuracy: {d}%\n", .{accuracy});
+        try stdout.print("\nTest Accuracy: {d}%\n", .{accuracy});
 
         // User drawing and classification
         if (opts.draw_digit == 1) {
@@ -95,7 +101,7 @@ pub fn main() anyerror!void {
             }
             net.forward(&input, 0.0, false);
             const prediction = net.predict();
-            std.debug.print("Predicted digit: {}\n", .{prediction});
+            try stdout.print("Predicted digit: {}\n", .{prediction});
         }
     }
 }
