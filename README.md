@@ -18,3 +18,4 @@ Upon running the program, a GUI window will appear where you can select a few tr
 
 -   Improve the GUI. It's currently written in C using SDL2 and is very primitive.
 -   Allow the user to modify the neural network architecture (number of layers, number of neurons per layer, activation functions, etc.).
+-   Build a Windows executable.
