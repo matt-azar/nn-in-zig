@@ -1,4 +1,4 @@
-# Neural Network in Zig #
+# Neural Network in Zig
 
 Written in zig version 0.14.
 
@@ -13,3 +13,8 @@ zig build run
 ```
 
 Upon running the program, a GUI window will appear where you can select a few training parameters for the neural network. You also have the option to load the weights and biases from a pre-trained model. Currently the only option is to load from the default location "mnist_model.bin", which is also the default save location for the model after training. Every time you train the model, it will overwrite this file. Training the model takes less than a minute with a reasonable number of epochs (each epoch takes about 2 seconds on my machine).
+
+## Todo list
+
+-   Improve the GUI. It's currently written in C using SDL2 and is very primitive.
+-   Allow the user to modify the neural network architecture (number of layers, number of neurons per layer, activation functions, etc.).
