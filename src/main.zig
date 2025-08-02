@@ -61,7 +61,7 @@ pub fn main() anyerror!void {
                         const image = train_images[i][j];
                         input[j] = @as(f64, @floatFromInt(image)) / 255.0;
                     }
-                    net.forward(&input, dropout_rate, true);
+                    net.forward(&input, dropout_rate, .Training);
                     net.backpropagate(&input, train_labels[i], learning_rate);
                     epoch_loss += net.cost(train_labels[i]);
                     if ((i + 1) % 1000 == 0 or i == train_num_images - 1) {
@@ -85,7 +85,7 @@ pub fn main() anyerror!void {
                 const image = test_images[i][j];
                 input[j] = @as(f64, @floatFromInt(image)) / 255.0;
             }
-            net.forward(&input, dropout_rate, false);
+            net.forward(&input, dropout_rate, .Inference);
             if (net.predict() == @as(usize, test_labels[i])) {
                 correct += 1;
             }
@@ -99,7 +99,7 @@ pub fn main() anyerror!void {
             for (0..Network.image_size) |j| {
                 input[j] = @as(f64, @floatFromInt(opts.digit_image[j])) / 255.0;
             }
-            net.forward(&input, 0.0, false);
+            net.forward(&input, dropout_rate, .Inference);
             const prediction = net.predict();
             try stdout.print("Predicted digit: {}\n", .{prediction});
         }

@@ -102,8 +102,13 @@ pub const Network = struct {
         return -std.math.log(f64, std.math.e, self.output[target_label] + epsilon);
     }
 
+    /// The phase of the neural network, either training or inference.
+    /// In training phase, dropout is applied to the hidden layers.
+    /// https://en.wikipedia.org/wiki/Dilution_(neural_networks)
+    pub const Phase = enum { Training, Inference };
+
     /// Train the neural network using gradient descent.
-    pub fn forward(self: *Network, input: []f64, dropout_rate: f64, is_training: bool) void {
+    pub fn forward(self: *Network, input: []f64, dropout_rate: f64, phase: Phase) void {
         var rng = std.Random.DefaultPrng.init(@abs(std.time.timestamp()));
 
         // First hidden layer
@@ -113,7 +118,7 @@ pub const Network = struct {
                 sum += input[j] * self.weights1[i * Network.image_size + j];
             }
             self.hidden1[i] = relu(sum);
-            if (is_training) {
+            if (phase == .Training) {
                 self.hidden1[i] *= if (rng.random().float(f64) > dropout_rate) 1.0 else 0.0;
             }
         }
@@ -125,7 +130,7 @@ pub const Network = struct {
                 sum += self.hidden1[j] * self.weights2[i * Network.hidden_size1 + j];
             }
             self.hidden2[i] = relu(sum);
-            if (is_training) {
+            if (phase == .Training) {
                 self.hidden2[i] *= if (rng.random().float(f64) > dropout_rate) 1.0 else 0.0;
             }
         }
